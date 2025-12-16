@@ -1,0 +1,8 @@
+package com.barasiqueira.util;
+
+public class MatriculaInvalidaException extends RuntimeException {
+
+    public MatriculaInvalidaException(String mensaje) {
+        super(mensaje);
+    }
+}
