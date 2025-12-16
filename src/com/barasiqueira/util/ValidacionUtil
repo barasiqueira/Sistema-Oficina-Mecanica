@@ -1,0 +1,99 @@
+package com.barasiqueira.util;
+
+import com.barasiqueira.modelo.Matricula;
+
+import java.util.Set;
+
+public class ValidacionUtil {
+
+    private static final String REGEX_MATRICULA = "^[A-Z]{1,2}-[0-9]{4}-[A-Z]{1,2}$";
+    private static final String REGEX_CODIGO = "^[0-9]{5}$";
+    private static final String REGEX_IMPORTE = "^(\\d{1,3}(\\.\\d{3})*|\\d+)(,\\d{1,2})?$";
+
+    private static final Set<String> SIGLAS_VALIDAS = Set.of(
+            "VI","AB","A","AL","O","AV","BA","PM","B","BU","CC","CA",
+            "S","CS","CR","CO","C","CU","GI","GR","GU","SS","H","HU",
+            "J","LE","L","LU","M","MA","MU","NA","OR","P","PO","SA",
+            "TF","SG","SE","SO","T","TE","TO","V","VA","ZA","Z","CE","ML"
+    );
+
+    public static void validarEntradaMatricula(String matricula)  {
+        if (esEntradaInvalida(matricula)) {
+            throw new MatriculaInvalidaException(" ¡Entrada vacía o nula! Entre con una matricula válida.");
+        }
+        if (esMatriculaInvalida(matricula)) {
+            throw new MatriculaInvalidaException(" ¡Formato inválido! Use:SIGLA-NNNN-LL(ej:M-1234-ES).");
+        }
+
+        String[] campos = matricula.split("-");
+        String provincia = campos[0];
+
+        if (!SIGLAS_VALIDAS.contains(provincia)) {
+            throw new MatriculaInvalidaException(" Província inválida " + provincia +
+                    ". Use una siglas válidas (Ej: M, B, V, etc.)");
+        }
+    }
+
+    public static Matricula parsearMatricula(String entrada) throws MatriculaInvalidaException {
+        validarEntradaMatricula(entrada);
+        String[] campos = entrada.split("-");
+        String provincia = campos[0];
+        String numero = campos[1];
+        String letra = campos[2];
+
+        return new Matricula(provincia, numero, letra);
+    }
+
+    public static void validarEntradaCodigo(String codigo)  {
+        if (esEntradaInvalida(codigo)) {
+            throw new CodigoInvalidoException(" ¡Entrada vacía o nula! Entre con un código válido.");
+        }
+        if (esCodigoInvalido(codigo)) {
+            throw new CodigoInvalidoException(" ¡Código inválido! Debe tener exactamente 5 dígitos (ej:01234).");
+        }
+    }
+
+    public static void validarEntradaImporte(String importe)  {
+
+        if (esEntradaInvalida(importe)) {
+            throw new ImporteInvalidoException(" ¡Entrada vacía o nula! Entre con un importe válido.");
+        }
+
+        if (esImporteInvalido(importe)) {
+            throw new ImporteInvalidoException("Importe introducido no es válido. (ej:1.000,00 o 100,50");
+        }
+    }
+
+    public static void validarEntradaDescripcion(String descripcion)  {
+
+        if (esEntradaInvalida(descripcion)) {
+            throw new IllegalArgumentException(" ¡Entrada vacía o nula! Entre con una descripción válida.");
+        }
+    }
+
+
+    public static boolean esEntradaInvalida(String entrada) {
+        if (entrada == null) {
+            return true;
+        }
+        return entrada.trim().isEmpty();
+    }
+
+    public static <T> void validadorGenerico(T objeto, String nombreObjeto) {
+        if (objeto == null) {
+            throw new IllegalArgumentException( nombreObjeto + " no puede ser nulo.");
+        }
+    }
+
+    private static boolean esMatriculaInvalida(String matricula) {
+        return !matricula.matches(REGEX_MATRICULA);
+    }
+
+    private static boolean esCodigoInvalido(String codigo) {
+        return !codigo.matches(REGEX_CODIGO);
+    }
+
+    private static boolean esImporteInvalido(String importe) {
+        return !importe.matches(REGEX_IMPORTE);
+    }
+}
